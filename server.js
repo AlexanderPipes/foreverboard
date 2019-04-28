@@ -11,12 +11,16 @@ const io = socketIO(server)
 
 io.on('connection', socket => {
 
-  socket.on('Drawn', (lines) => {
-    currentLines = lines; 
-    io.sockets.emit('Drawn', lines)
-  });
+    socket.on('Drawn', (line) => {
+        currentLines.push(line);
+        io.sockets.emit('Drawn', line)
+    });
 
-  io.sockets.emit('Drawn' , currentLines);
+    socket.on('Clear', () => {
+        currentLines = [];
+        io.sockets.emit('fullRefresh', currentLines)
+    });
+    io.sockets.emit('fullRefresh', currentLines);
 })
 
 server.listen(port, () => console.log(`Listening on port ${port}`))
