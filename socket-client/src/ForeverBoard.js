@@ -65,8 +65,8 @@ class ForeverBoard extends React.Component {
     relativeCoordinatesForEvent(mouseEvent) {
         const boundingRect = this.refs.drawArea.getBoundingClientRect();
         return new Immutable.Map({
-            x: mouseEvent.clientX - boundingRect.left,
-            y: mouseEvent.clientY - boundingRect.top,
+            x: mouseEvent.clientX - boundingRect.left - 10, // account for 10px border
+            y: mouseEvent.clientY - boundingRect.top - 10,
         });
     }
 
