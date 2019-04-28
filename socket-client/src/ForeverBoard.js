@@ -14,7 +14,10 @@ class ForeverBoard extends React.Component {
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.socket = socketIOClient(this.state.endpoint);
-        this.socket.on('fullRefresh', (serverLines) => {
+        this.path = window.location.pathname;
+        this.socket.on('fullRefresh', (serverLines, path) => {
+            if (path !== this.path)
+                return;
             this.setState({
                 lines: new Immutable.List(serverLines).map(line =>
                     new Immutable.List(line).map(pt =>
@@ -32,6 +35,7 @@ class ForeverBoard extends React.Component {
                     onMouseMove={this.handleMouseMove} >
                     <Drawing lines={this.state.lines} />
                 </div>
+                <br />
                 <button onClick={() => this.clear()}>Clear</button>
             </div>
 
@@ -41,7 +45,7 @@ class ForeverBoard extends React.Component {
         this.setState({
             lines: new Immutable.List()
         }, () => {
-            this.socket.emit('Clear')
+            this.socket.emit('Clear', this.path)
         });
     }
 
@@ -49,9 +53,7 @@ class ForeverBoard extends React.Component {
         if (mouseEvent.button !== 0) {
             return;
         }
-
         const point = this.relativeCoordinatesForEvent(mouseEvent);
-
         this.setState(prevState => {
             return {
                 lines: prevState.lines.push(new Immutable.List([point])),
@@ -72,19 +74,18 @@ class ForeverBoard extends React.Component {
         if (!this.state.isDrawing) {
             return;
         }
-
         const point = this.relativeCoordinatesForEvent(mouseEvent);
-
         this.setState(prevState => {
             return {
-                lines: prevState.lines.updateIn([prevState.lines.size - 1], line => line.push(point)),
+                lines: prevState.lines.updateIn([prevState.lines.size - 1], line => line.push(point))
             };
         });
     }
 
     componentDidMount() {
-
-        this.socket.on('Drawn', (serverLine) => {
+        this.socket.on('Drawn', (serverLine, path) => {
+            if (path !== this.path)
+                return;
             this.setState(prevState => {
                 return {
                     lines: prevState.lines.push(
@@ -101,7 +102,7 @@ class ForeverBoard extends React.Component {
     }
     handleMouseUp() {
         this.setState({ isDrawing: false });
-        this.socket.emit('Drawn', this.state.lines.get(this.state.lines.size - 1));
+        this.socket.emit('Drawn', this.state.lines.get(this.state.lines.size - 1), this.path);
     }
 }
 
