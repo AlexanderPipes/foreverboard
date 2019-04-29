@@ -5,6 +5,7 @@ sudo apt install node npm
 npm install
 cd socket-client
 npm install
+npm run build // must be run in socket-client directory
 
 // set up the database
 sudo apt-get install mysql-server
@@ -27,3 +28,12 @@ create table boards (path VARCHAR(255) unique, drawing LONGTEXT);
 
 
 // to start the server up once you have mysql and the table set up run
+// '&' means run in the background
+sudo node server.js &
+cd socket-client
+sudo node client-server.js &
+
+// to restart the servers run
+sudo pkill node
+// then the code above to start them back up
+// if you changed the client you have to run 'npm run build' again
