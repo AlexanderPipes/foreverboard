@@ -8,7 +8,9 @@ class ForeverBoard extends React.Component {
         this.state = {
             isDrawing: false,
             lines: new Immutable.List(),
-            endpoint: "http://localhost:4001"
+
+            // name of the server you are running server js on
+            endpoint: "http://foreverboard.eastus.cloudapp.azure.com:4001"
         };
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);

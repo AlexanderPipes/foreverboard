@@ -1,0 +1,29 @@
+//install node and npm
+sudo apt install node npm
+
+//after cloning the repo run change directories into it and run
+npm install
+cd socket-client
+npm install
+
+// set up the database
+sudo apt-get install mysql-server
+systemctl start mysql
+systemctl enable mysql //launch at reboot
+sudo mysql // to start connection
+
+create user 'forever_board'@'localhost';
+grant all privileges on * . * to 'forever_board'@'localhost';
+
+//now we can sign in as forever_board to mysql
+mysql -u forever_board
+
+create database foreverboard;
+use foreverboard;
+
+//path must be unique so you can only have 1 drawing per path
+create table boards (path VARCHAR(255) unique, drawing LONGTEXT);
+\q // to quit
+
+
+// to start the server up once you have mysql and the table set up run
