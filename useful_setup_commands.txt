@@ -13,6 +13,7 @@ systemctl start mysql
 systemctl enable mysql //launch at reboot
 sudo mysql // to start connection
 
+//make special user for program
 create user 'forever_board'@'localhost';
 grant all privileges on * . * to 'forever_board'@'localhost';
 
