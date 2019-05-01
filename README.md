@@ -1,7 +1,13 @@
 Main files:
 
-Movie: ./ForeverBoardVid.mov
-Write-up: ./ForeverBoard.docx
+Movie: 
+* ./ForeverBoardVid.mov
+
+Write-up: 
+* ./ForeverBoard.docx
+
+Power-Point:
+* ./ForeverBoardPPT.pptx
 
 
 Useful commands for deployment and database setup: 
