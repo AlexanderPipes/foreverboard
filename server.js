@@ -26,15 +26,19 @@ const server = http.createServer(app);
 const io = socketIO(server);
 function setUpSocket() {
     io.on('connection', socket => {
+        // On connection get the url
         var connectionPath = url.parse(socket.request.headers.referer).pathname;
 
+        // add url if it isnt in the database already
         initNewUrlIfNeeded(connectionPath);
 
+        // listener to recieve lines drawn from the client 
         socket.on('Drawn', (line, path) => {
             addLineToUrl(line, path);
             io.sockets.emit('Drawn', line, path)
         });
 
+        // listener for clear signals sent from the client
         socket.on('Clear', (path) => {
             resetLinesForUrl(path);
             getLinesForUrl(connectionPath, (lines) => {
@@ -42,12 +46,15 @@ function setUpSocket() {
             });
         });
 
+        // does a refresh of the page when someone connects to the url
+        // to give them the current state of the drawing
         getLinesForUrl(connectionPath, (lines) => {
             io.sockets.emit('fullRefresh', lines, connectionPath);
         });
     })
 }
 
+// Adds the new url to the database and sets empty lines for the drawing
 function initNewUrlIfNeeded(path) {
     var queryString = "insert ignore into boards values ('" + path + "','[]');";
     con.query(queryString, function(err, rows, fields) {
@@ -55,6 +62,7 @@ function initNewUrlIfNeeded(path) {
     });
 }
 
+// Adds the last line to the drawing in the database relating to the specific url
 function addLineToUrl(line, path) {
     getLinesForUrl(path, (lines) => {
         lines.push(line);
@@ -66,6 +74,7 @@ function addLineToUrl(line, path) {
     });
 }
 
+// clears the drawing in the database.
 function resetLinesForUrl(path) {
     var queryString = "update boards set drawing = '[]' where path = '" + path + "';";
     con.query(queryString, function(err, rows, fields) {
@@ -73,6 +82,10 @@ function resetLinesForUrl(path) {
     });
 }
 
+// retrieves the lines for the url that is specified
+// this function is asynchronous and could possibly take a while
+// If you want to do something with the lines retrieved pass in a successFunc
+// that takes a signle line
 function getLinesForUrl(path, successFunc) {
     var queryString = "select drawing from boards where path = '" + path + "';";
     con.query(queryString, function(err, rows, fields) {

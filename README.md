@@ -1,10 +1,11 @@
 Main files:
 
-Movie: 
+Movie (Sample Output): 
 * ./ForeverBoardVid.mov
 
 Write-up: 
 * ./ForeverBoard.docx
+* ./ForeverBoard.pdf
 
 Power-Point:
 * ./ForeverBoardPPT.pptx
@@ -17,9 +18,11 @@ Useful commands for deployment and database setup:
 Diagrams:
 * ./LinesDataStructure.png
 * ./ProjectArchitecture.png
+* ./FlowDiagram.png
+* ./UMLdiagram.png
+* ./BoardTable.png
 
-
-Code files:
+Relevant Code files:
 * ./server.js
 * ./socket-client/client-server.js
 * ./socket-client/src/ForeverBoard.js

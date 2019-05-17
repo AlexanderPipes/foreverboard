@@ -17,6 +17,9 @@ class ForeverBoard extends React.Component {
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.socket = socketIOClient(this.state.endpoint);
         this.path = window.location.pathname;
+
+        // when full refresh is called it checks the url then retrieves the lines for that url
+        // This is used to completely set the state of a drawing, done on connect and clear
         this.socket.on('fullRefresh', (serverLines, path) => {
             if (path !== this.path)
                 return;
@@ -28,6 +31,11 @@ class ForeverBoard extends React.Component {
         });
     }
 
+
+    // This is a React component specific function that gets called
+    // every time the state is updated.  Here is where we call the function
+    // that turns our list of list of maps to an SVG
+    // centers the draw area creates the clear button
     render() {
         return (
             <div style={{ textAlign: "center" }}>
@@ -43,6 +51,9 @@ class ForeverBoard extends React.Component {
 
         );
     }
+
+    // Sends a signal to the server that says to update it's state to an empty list
+    // the server should send a full refresh back to update all other users
     clear() {
         this.setState({
             lines: new Immutable.List()
@@ -51,6 +62,8 @@ class ForeverBoard extends React.Component {
         });
     }
 
+    // on mouse down if it isnt left click ignore and if it is start drawing
+    // this starts a new line at the end of a drawing that mouse move will append to
     handleMouseDown(mouseEvent) {
         if (mouseEvent.button !== 0) {
             return;
@@ -64,6 +77,7 @@ class ForeverBoard extends React.Component {
         });
     }
 
+
     relativeCoordinatesForEvent(mouseEvent) {
         const boundingRect = this.refs.drawArea.getBoundingClientRect();
         return new Immutable.Map({
@@ -72,6 +86,8 @@ class ForeverBoard extends React.Component {
         });
     }
 
+    // every time the mouse moves we append to the latest line in the list the new point it is on
+    // this is true until the user mouses up and "isDrawing" is false
     handleMouseMove(mouseEvent) {
         if (!this.state.isDrawing) {
             return;
@@ -84,6 +100,8 @@ class ForeverBoard extends React.Component {
         });
     }
 
+    // Readct function called when this component is first mounted
+    // sets the listeners for events either from the mouse or the server
     componentDidMount() {
         this.socket.on('Drawn', (serverLine, path) => {
             if (path !== this.path)
@@ -102,13 +120,16 @@ class ForeverBoard extends React.Component {
     componentWillUnmount() {
         document.removeEventListener("mouseup", this.handleMouseUp);
     }
+
+    // emit that a line was just drawn when mouse is released and make sure to set drawing to false
+    // so mouse move will not continue adding to it
     handleMouseUp() {
         this.setState({ isDrawing: false });
         this.socket.emit('Drawn', this.state.lines.get(this.state.lines.size - 1), this.path);
     }
-}
+}  // end class ForeverBoard
 
-
+// Convert the internal data structure into html tags the User can see
 function Drawing({ lines }) {
     return (
         <svg className="drawing">
@@ -119,6 +140,7 @@ function Drawing({ lines }) {
     );
 }
 
+// svg tags to start a line and connect the map of points
 function DrawingLine({ line }) {
     const pathData = "M " +
         line
